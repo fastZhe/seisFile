@@ -5,6 +5,7 @@ import edu.iris.dmc.seedcodec.DecompressedData;
 import edu.sc.seis.seisFile.mseed.*;
 
 import java.io.*;
+import java.time.ZoneOffset;
 
 /**
  * 描述:
@@ -30,14 +31,42 @@ public class MiniSeed256Input {
     }
 
 
+
+
+
     public void readMiniSeedFile(File sourceFile) throws IOException, SeedFormatException {
         DataInputStream dataInputStream = new DataInputStream(new FileInputStream(sourceFile));
         int count=0;
+        DataRecord pre=null;
         while (true) {
             count++;
             System.out.println("总共："+count);
             DataRecord read = (DataRecord) DataRecord.read(dataInputStream);
+            if (count%2==1) pre=read;
+            try {
+                DataRecord dataRecord = MiniseedConvert.convert256To512(pre, read);
+                System.out.println(dataRecord.getRecordSize());
+                Btime begin = dataRecord.getBtimeRange().getBegin();
+                Btime end = dataRecord.getBtimeRange().getEnd();
+
+                //System.out.println(dataRecord.getBtimeRange().getBegin().getLocalDateTime().toInstant(ZoneOffset.of("+08:00")));
+                System.out.println(begin.getLocalDateTime()+"  begin");
+                System.out.println(end.getLocalDateTime()+"  end");
+                System.out.println("开始天 ："+begin.getLocalDateTime().getDayOfMonth());
+
+
+            } catch (CodecException e) {
+                e.printStackTrace();
+            }
             DataHeader controlHeader = (DataHeader) read.getControlHeader();
+
+            Btime begin = read.getBtimeRange().getBegin();
+            Btime end = read.getBtimeRange().getEnd();
+            System.out.println(begin.getLocalDateTime()+"  begin");
+            System.out.println(end.getLocalDateTime()+"  end");
+            System.out.println("开始天 ："+begin.getLocalDateTime().getDayOfMonth());
+
+
             System.out.println(controlHeader.getStartTime());
             Blockette blockette = read.getBlockettes()[0];
             byte[] bytes1 = read.toByteArray();

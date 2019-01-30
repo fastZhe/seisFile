@@ -5,6 +5,11 @@
  */
 package edu.sc.seis.seisFile.mseed;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -13,6 +18,8 @@ import java.util.TimeZone;
 public class Btime {
     
     public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+
+    public DateTimeFormatter formatters = DateTimeFormatter.ofPattern("yyyy年MM月dd日");
 
     public Btime(Date date) {
         Calendar cal = Calendar.getInstance(UTC);
@@ -138,6 +145,8 @@ public class Btime {
 
     public int tenthMilli = 0;
 
+    public LocalDateTime localDateTime;
+
     
     public int getYear() {
         return year;
@@ -202,6 +211,34 @@ public class Btime {
                                        false);
         return year < 1960 || year > 2055;
     }
+
+    /**
+     * 1000000000 纳秒
+     * 1000000  微秒
+     * 1000毫秒
+     * @return
+     */
+    public LocalDateTime getLocalDateTime(){
+        //纳秒
+        int nanoMillion = getTenthMilli() * 100000;
+        LocalDate date=LocalDate.ofYearDay(this.year,this.jday);
+        LocalTime time=LocalTime.of(this.hour,this.min,this.sec,nanoMillion);
+        return LocalDateTime.of(date,time);
+    }
+
+
+//    /**
+//     * 1000000000 纳秒
+//     * 1000000  微秒
+//     * 1000毫秒
+//     * @return
+//     */
+//    public LocalDateTime getLocalDateTime(String zone){
+//        return getLocalDateTime().atZone(ZoneId.of("00")).toLocalDateTime();
+//    }
+
+
+
     
     private static BtimeComparator comparator = new BtimeComparator();
 
