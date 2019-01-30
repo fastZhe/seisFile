@@ -6,6 +6,7 @@ import edu.sc.seis.seisFile.mseed.*;
 
 import java.io.*;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 /**
  * 描述:
@@ -65,8 +66,8 @@ public class MiniSeed256Input {
             System.out.println(begin.getLocalDateTime()+"  begin");
             System.out.println(end.getLocalDateTime()+"  end");
             System.out.println("开始天 ："+begin.getLocalDateTime().getDayOfMonth());
-
-
+            DateTimeFormatter dateTimeFormatter=DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            System.out.println(begin.getLocalDateTime().format(dateTimeFormatter));
             System.out.println(controlHeader.getStartTime());
             Blockette blockette = read.getBlockettes()[0];
             byte[] bytes1 = read.toByteArray();
